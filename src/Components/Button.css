@@ -1,0 +1,26 @@
+.Button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5rem;
+  height: 4.5rem;
+  margin: 0.1rem;
+  font-size: 2rem;
+}
+
+.number {
+  background-color: #75767b;
+}
+
+.zeroNumber {
+  width: 10rem;
+  background-color: #75767b;
+}
+
+.secOperator {
+  background-color: rgb(78, 81, 85);
+}
+
+.primOperator {
+  background-color: #F3A13B;
+}
