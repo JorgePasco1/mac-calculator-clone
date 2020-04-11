@@ -1,3 +1,7 @@
+# Mac Calculator Clone
+Practice project using ReactJs. It replicates the behavior (And somewhat the UI) of the built-in MacOs Calculator.
+
+# Create React App
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
