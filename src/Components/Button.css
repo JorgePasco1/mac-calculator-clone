@@ -1,26 +1,49 @@
 .Button {
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  border: none;
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 5rem;
   height: 4.5rem;
-  margin: 0.1rem;
-  font-size: 2rem;
+  font-size: 1.5rem;
+  margin: 0 1px 1px 0;
+}
+
+.Button:focus {
+  outline: 0;
 }
 
 .number {
   background-color: #75767b;
 }
 
+.number:active {
+  background-color: #b4b5bd;
+}
+
 .zeroNumber {
-  width: 10rem;
+  width: 10.1rem;
   background-color: #75767b;
+}
+
+.zeroNumber:active {
+  background-color: #b4b5bd;
 }
 
 .secOperator {
   background-color: rgb(78, 81, 85);
 }
 
+.secOperator:active {
+  background-color: #75767b;
+}
+
 .primOperator {
-  background-color: #F3A13B;
+  background-color: rgb(242, 150, 38);
+}
+
+.primOperator:active {
+  background-color: rgb(210, 116, 2);
 }
