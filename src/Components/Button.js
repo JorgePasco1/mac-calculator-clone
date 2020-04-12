@@ -1,19 +1,14 @@
-import React, { Component } from "react";
+import React from "react";
 import "./Button.css";
 
-// { type, content, handleClick }
-class Button extends Component {
-  childrenHandleClick = () => {
-    this.props.handleClick(this.props.content)
+export default function Button({name, type, handleClick}) {
+  function childrenHandleClick() {
+    handleClick(name);
   }
 
-  render() {
-    return (
-      <button className={`Button ${this.props.type}`} onClick={this.childrenHandleClick}>
-        {this.props.content}
-      </button>
-    );
-  }
+  return (
+    <button className={`Button ${type}`} onClick={childrenHandleClick}>
+      {name}
+    </button>
+  );
 }
-
-export default Button;

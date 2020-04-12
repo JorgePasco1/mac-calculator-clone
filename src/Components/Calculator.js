@@ -6,13 +6,15 @@ export default class Calculator extends Component {
   constructor() {
     super();
     this.state = {
-      input: "",
+      accumulator: 0,
+      currentInput: "",
       fontSize: 3.5,
+      currentOperation: "input",
     };
   }
 
   handleClick = (character) => {
-    const currentInputLenght = this.state.input.length;
+    const currentInputLenght = this.state.currentInput.length;
     if (currentInputLenght >= 8 && currentInputLenght <= 13) {
       this.setState((prevState) => ({
         ...prevState,
@@ -23,14 +25,53 @@ export default class Calculator extends Component {
     if (currentInputLenght > 15) {
       this.setState((prevState) => ({ ...prevState }));
     } else {
+      if (this.state.currentOperation === "input") {
+        this.setState((prevState) => ({
+          currentInput: prevState.currentInput + character,
+        }));
+      } else {
+        this.setState((prevState) => ({
+          currentInput: character,
+          currentOperation: "input",
+        }));
+      }
+    }
+  };
+
+  clearInput = (name) => {
+    if (name === "AC") {
       this.setState((prevState) => ({
-        input: prevState.input + character,
+        ...prevState,
+        accumulator: 0,
+      }));
+    } else {
+      this.setState((prevState) => ({
+        ...prevState,
+        currentInput: "",
+        fontSize: 3.5,
       }));
     }
   };
 
-  clearInput = () => {
-    this.setState({ input: "", fontSize: 3.5 });
+  handleOperator = (operator) => {
+    if (this.state.currentOperation === "input") {
+      let currentOperation;
+      let newAccumulator;
+      if (operator === "+") {
+        currentOperation = "sum";
+        newAccumulator = this.state.accumulator + +this.state.currentInput;
+      }
+      this.setState((prevState) => ({
+        ...prevState,
+        currentOperation: currentOperation,
+        accumulator: newAccumulator,
+        currentInput: newAccumulator,
+      }));
+    }
+  };
+
+  handleEquals = () => {
+    console.log(this.state);
   };
 
   render() {
@@ -40,55 +81,47 @@ export default class Calculator extends Component {
           className="monitor"
           style={{ fontSize: `${this.state.fontSize}rem` }}
         >
-          {this.state.input || 0}
+          {this.state.currentInput || 0}
         </div>
         <Button
           type="secOperator"
-          content={this.state.input ? "C" : "AC"}
+          name={this.state.currentInput ? "C" : "AC"}
           handleClick={this.clearInput}
         />
-        <Button
-          type="secOperator"
-          content="+/-"
-          handleClick={this.handleClick}
-        />
-        <Button type="secOperator" content="%" handleClick={this.handleClick} />
+        <Button type="secOperator" name="+/-" handleClick={this.handleClick} />
+        <Button type="secOperator" name="%" handleClick={this.handleClick} />
         <Button
           type="primOperator"
-          content="÷"
-          handleClick={this.handleClick}
+          name="÷"
+          handleClick={this.handleOperator}
         />
-        <Button type="number" content="7" handleClick={this.handleClick} />
-        <Button type="number" content="8" handleClick={this.handleClick} />
-        <Button type="number" content="9" handleClick={this.handleClick} />
+        <Button type="number" name="7" handleClick={this.handleClick} />
+        <Button type="number" name="8" handleClick={this.handleClick} />
+        <Button type="number" name="9" handleClick={this.handleClick} />
         <Button
           type="primOperator"
-          content="x"
-          handleClick={this.handleClick}
+          name="x"
+          handleClick={this.handleOperator}
         />
-        <Button type="number" content="4" handleClick={this.handleClick} />
-        <Button type="number" content="5" handleClick={this.handleClick} />
-        <Button type="number" content="6" handleClick={this.handleClick} />
+        <Button type="number" name="4" handleClick={this.handleClick} />
+        <Button type="number" name="5" handleClick={this.handleClick} />
+        <Button type="number" name="6" handleClick={this.handleClick} />
         <Button
           type="primOperator"
-          content="-"
-          handleClick={this.handleClick}
+          name="-"
+          handleClick={this.handleOperator}
         />
-        <Button type="number" content="1" handleClick={this.handleClick} />
-        <Button type="number" content="2" handleClick={this.handleClick} />
-        <Button type="number" content="3" handleClick={this.handleClick} />
+        <Button type="number" name="1" handleClick={this.handleClick} />
+        <Button type="number" name="2" handleClick={this.handleClick} />
+        <Button type="number" name="3" handleClick={this.handleClick} />
         <Button
           type="primOperator"
-          content="+"
-          handleClick={this.handleClick}
+          name="+"
+          handleClick={this.handleOperator}
         />
-        <Button type="zeroNumber" content="0" handleClick={this.handleClick} />
-        <Button type="number" content="." handleClick={this.handleClick} />
-        <Button
-          type="primOperator"
-          content="="
-          handleClick={this.handleClick}
-        />
+        <Button type="zeroNumber" name="0" handleClick={this.handleClick} />
+        <Button type="number" name="." handleClick={this.handleClick} />
+        <Button type="primOperator" name="=" handleClick={this.handleEquals} />
       </div>
     );
   }
