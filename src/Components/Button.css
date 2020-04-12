@@ -44,6 +44,10 @@
   background-color: rgb(242, 150, 38);
 }
 
+.primOperator:focus {
+  border: 1px solid #393a3c;
+}
+
 .primOperator:active {
   background-color: rgb(210, 116, 2);
 }
