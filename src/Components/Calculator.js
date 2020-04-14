@@ -7,12 +7,11 @@ export default class Calculator extends Component {
     super();
     this.state = {
       accumulator: 0,
-      lastOperation: "",
       currentInput: "",
       partialAcc: 0,
       currentOperation: "none",
-      fontSize: 3.5,
       currentState: "input",
+      fontSize: 3.5,
     };
   }
 
@@ -92,11 +91,12 @@ export default class Calculator extends Component {
     if (operator === "x" || operator === "÷") {
       this.setState((prevState) => ({
         ...prevState,
-        partialAcc: prevState.accumulator || +prevState.currentInput,
+        partialAcc: +prevState.currentInput,
         currentOperation: operator === "x" ? "multiplication" : "division",
         currentState: "newInput",
       }));
     }
+
     if (this.state.currentState === "input") {
       this.doCalculation();
     }
