@@ -7,13 +7,16 @@ export default class Calculator extends Component {
     super();
     this.state = {
       accumulator: 0,
+      lastOperation: "",
       currentInput: "",
+      partialAcc: 0,
+      currentOperation: "none",
       fontSize: 3.5,
-      currentOperation: "input",
+      currentState: "input",
     };
   }
 
-  handleClick = (character) => {
+  handleNumberClick = (character) => {
     const currentInputLenght = this.state.currentInput.length;
     if (currentInputLenght >= 8 && currentInputLenght <= 13) {
       this.setState((prevState) => ({
@@ -25,24 +28,56 @@ export default class Calculator extends Component {
     if (currentInputLenght > 15) {
       this.setState((prevState) => ({ ...prevState }));
     } else {
-      if (this.state.currentOperation === "input") {
+      if (this.state.currentState === "input") {
         this.setState((prevState) => ({
           currentInput: prevState.currentInput + character,
         }));
       } else {
         this.setState((prevState) => ({
+          ...prevState,
           currentInput: character,
-          currentOperation: "input",
+          currentState: "input",
         }));
       }
     }
   };
 
+  doCalculation = () => {
+    const currentOp = this.state.currentOperation;
+    if (currentOp === "multiplication" || currentOp === "division") {
+      const partialResult =
+        currentOp === "multiplication"
+          ? this.state.partialAcc * this.state.currentInput
+          : this.state.partialAcc / this.state.currentInput;
+      this.setState((prevState) => ({
+        ...prevState,
+        partialAcc: partialResult,
+        currentInput: partialResult,
+      }));
+    }
+  };
+
+  handleEquals = () => {
+    this.doCalculation();
+    this.setState((prevState) => ({
+      ...prevState,
+      accumulator: prevState.accumulator + prevState.partialAcc,
+      currentInput: prevState.accumulator + prevState.partialAcc,
+      accumulator: 0,
+      partialAcc: 0,
+      currentOperation: "none",
+    }));
+  };
+
   clearInput = (name) => {
     if (name === "AC") {
       this.setState((prevState) => ({
-        ...prevState,
         accumulator: 0,
+        partialAcc: 0,
+        lastOperation: "",
+        currentInput: "",
+        fontSize: 3.5,
+        currentState: "input",
       }));
     } else {
       this.setState((prevState) => ({
@@ -53,24 +88,21 @@ export default class Calculator extends Component {
     }
   };
 
-  handleOperator = (operator) => {
-    if (this.state.currentOperation === "input") {
-      let currentOperation;
-      let newAccumulator;
-      if (operator === "+") {
-        currentOperation = "sum";
-        newAccumulator = this.state.accumulator + +this.state.currentInput;
-      }
+  handlePrimOperator = (operator) => {
+    if (operator === "x" || operator === "÷") {
       this.setState((prevState) => ({
         ...prevState,
-        currentOperation: currentOperation,
-        accumulator: newAccumulator,
-        currentInput: newAccumulator,
+        partialAcc: prevState.accumulator || +prevState.currentInput,
+        currentOperation: operator === "x" ? "multiplication" : "division",
+        currentState: "newInput",
       }));
+    }
+    if (this.state.currentState === "input") {
+      this.doCalculation();
     }
   };
 
-  handleEquals = () => {
+  showState = () => {
     console.log(this.state);
   };
 
@@ -93,34 +125,38 @@ export default class Calculator extends Component {
         <Button
           type="primOperator"
           name="÷"
-          handleClick={this.handleOperator}
+          handleClick={this.handlePrimOperator}
         />
-        <Button type="number" name="7" handleClick={this.handleClick} />
-        <Button type="number" name="8" handleClick={this.handleClick} />
-        <Button type="number" name="9" handleClick={this.handleClick} />
+        <Button type="number" name="7" handleClick={this.handleNumberClick} />
+        <Button type="number" name="8" handleClick={this.handleNumberClick} />
+        <Button type="number" name="9" handleClick={this.handleNumberClick} />
         <Button
           type="primOperator"
           name="x"
-          handleClick={this.handleOperator}
+          handleClick={this.handlePrimOperator}
         />
-        <Button type="number" name="4" handleClick={this.handleClick} />
-        <Button type="number" name="5" handleClick={this.handleClick} />
-        <Button type="number" name="6" handleClick={this.handleClick} />
+        <Button type="number" name="4" handleClick={this.handleNumberClick} />
+        <Button type="number" name="5" handleClick={this.handleNumberClick} />
+        <Button type="number" name="6" handleClick={this.handleNumberClick} />
         <Button
           type="primOperator"
           name="-"
-          handleClick={this.handleOperator}
+          handleClick={this.handlePrimOperator}
         />
-        <Button type="number" name="1" handleClick={this.handleClick} />
-        <Button type="number" name="2" handleClick={this.handleClick} />
-        <Button type="number" name="3" handleClick={this.handleClick} />
+        <Button type="number" name="1" handleClick={this.handleNumberClick} />
+        <Button type="number" name="2" handleClick={this.handleNumberClick} />
+        <Button type="number" name="3" handleClick={this.handleNumberClick} />
         <Button
           type="primOperator"
           name="+"
-          handleClick={this.handleOperator}
+          handleClick={this.handlePrimOperator}
         />
-        <Button type="zeroNumber" name="0" handleClick={this.handleClick} />
-        <Button type="number" name="." handleClick={this.handleClick} />
+        <Button
+          type="zeroNumber"
+          name="0"
+          handleClick={this.handleNumberClick}
+        />
+        <Button type="number" name="." handleClick={this.showState} />
         <Button type="primOperator" name="=" handleClick={this.handleEquals} />
       </div>
     );
