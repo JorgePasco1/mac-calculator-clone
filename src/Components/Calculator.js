@@ -56,14 +56,13 @@ export default class Calculator extends Component {
 
   doCalculation = (operator) => {
     if (operator === "x" || operator === "÷") {
-      console.log("doing multiply");
       const partialResult =
         operator === "x"
           ? this.state.partialAcc * this.state.currentInput
           : this.state.partialAcc / this.state.currentInput;
       this.setState((prevState) => ({
         ...prevState,
-        partialAcc: partialResult,
+        partialAcc: prevState.previousOperation === "-" ? -partialResult : partialResult,
         currentInput: partialResult,
         currentState: "newResult",
         previousOperation: operator,
@@ -124,28 +123,18 @@ export default class Calculator extends Component {
   };
 
   handlePrimOperator = (operator) => {
-    if (operator === "x" || operator === "÷") {
-      this.setState((prevState) => ({
-        ...prevState,
-        partialAcc: +prevState.currentInput,
-
-        currentOperation: operator === "x" ? "multiplication" : "division",
-        currentState: "newInput",
-      }));
-    } else {
-      if (
-        this.state.previousOperation === "x" ||
-        this.state.previousOperation === "÷"
-      ) {
-        this.handleEquals();
-      }
-      this.setState((prevState) => ({
-        ...prevState,
-        currentOperation: operator === "+" ? "addition" : "substraction",
-        partialAcc: operator === "+" ? 1 : -1,
-        currentState: "newInput",
-      }));
-    }
+    if (
+      this.state.previousOperation === "x" ||
+      this.state.previousOperation === "÷"
+    ) {
+      this.handleEquals();
+    } 
+    this.setState((prevState) => ({
+      ...prevState,
+      currentOperation: operator,
+      currentState: "newInput",
+    }));
+    // }
 
     if (
       this.state.currentState === "input" ||
