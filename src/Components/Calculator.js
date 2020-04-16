@@ -5,11 +5,12 @@ import "./Calculator.css";
 const initialState = {
   accumulator: 0,
   currentInput: "",
-  partialAcc: 0,
+  partialAcc: 1,
   currentOperation: "none",
   currentState: "input",
   fontSize: 3.5,
-}
+  previousOperation: "none",
+};
 
 export default class Calculator extends Component {
   constructor() {
@@ -17,7 +18,13 @@ export default class Calculator extends Component {
     this.state = initialState;
   }
 
-  handleNumberClick = (character) => {
+  calculateFontSize = () => {
+    if (this.state.currentState != "input") {
+      this.setState((prevState) => ({
+        ...prevState,
+        fontSize: initialState.fontSize,
+      }));
+    }
     const currentInputLenght = this.state.currentInput.length;
     if (currentInputLenght >= 8 && currentInputLenght <= 13) {
       this.setState((prevState) => ({
@@ -25,8 +32,11 @@ export default class Calculator extends Component {
         fontSize: prevState.fontSize - 0.3,
       }));
     }
+  };
 
-    if (currentInputLenght > 15) {
+  handleNumberClick = (character) => {
+    this.calculateFontSize();
+    if (this.state.currentInput.length > 15) {
       this.setState((prevState) => ({ ...prevState }));
     } else {
       if (this.state.currentState === "input") {
@@ -36,6 +46,7 @@ export default class Calculator extends Component {
       } else {
         this.setState((prevState) => ({
           ...prevState,
+          currentOperation: "none",
           currentInput: character,
           currentState: "input",
         }));
@@ -43,11 +54,11 @@ export default class Calculator extends Component {
     }
   };
 
-  doCalculation = () => {
-    const currentOp = this.state.currentOperation;
-    if (currentOp === "multiplication" || currentOp === "division") {
+  doCalculation = (operator) => {
+    if (operator === "x" || operator === "÷") {
+      console.log("doing multiply");
       const partialResult =
-        currentOp === "multiplication"
+        operator === "x"
           ? this.state.partialAcc * this.state.currentInput
           : this.state.partialAcc / this.state.currentInput;
       this.setState((prevState) => ({
@@ -55,36 +66,54 @@ export default class Calculator extends Component {
         partialAcc: partialResult,
         currentInput: partialResult,
         currentState: "newResult",
+        previousOperation: operator,
       }));
-    } else if (currentOp === "addition" || currentOp === "substraction"){
+    } else {
       this.setState((prevState) => ({
         ...prevState,
-        accumulator: prevState.accumulator + +prevState.currentInput,
-        currentInput: prevState.accumulator + +prevState.currentInput,
+        accumulator:
+          prevState.accumulator +
+          (prevState.previousOperation === "-"
+            ? -prevState.currentInput
+            : +prevState.currentInput),
+        currentInput:
+          prevState.accumulator +
+          (prevState.previousOperation === "-"
+            ? -prevState.currentInput
+            : +prevState.currentInput),
         currentState: "newResult",
+        previousOperation: operator,
       }));
     }
   };
 
   handleEquals = () => {
-    this.doCalculation();
-    if (
-      this.state.currentOperation === "multiplication" ||
-      this.state.currentOperation === "division"
-    ) {
-      this.setState((prevState) => ({
-        ...prevState,
-        accumulator: prevState.accumulator + prevState.partialAcc,
-        currentInput: prevState.accumulator + prevState.partialAcc,
-        partialAcc: 0,
-        currentOperation: "none",
-      }));
-    }
+    this.doCalculation(this.state.previousOperation);
+
+    this.setState((prevState) => ({
+      ...prevState,
+      accumulator:
+        prevState.accumulator +
+        (prevState.previousOperation === "x" ||
+        prevState.previousOperation === "÷"
+          ? prevState.partialAcc
+          : 0),
+      currentInput:
+        prevState.accumulator +
+        (prevState.previousOperation === "x" ||
+        prevState.previousOperation === "÷"
+          ? prevState.partialAcc
+          : 0),
+      accumulator: 0,
+      partialAcc: 1,
+      currentOperation: "none",
+      previousOperation: "none",
+    }));
   };
 
   clearInput = (name) => {
     if (name === "AC") {
-      this.setState((initialState));
+      this.setState(initialState);
     } else {
       this.setState((prevState) => ({
         ...prevState,
@@ -99,25 +128,30 @@ export default class Calculator extends Component {
       this.setState((prevState) => ({
         ...prevState,
         partialAcc: +prevState.currentInput,
+
         currentOperation: operator === "x" ? "multiplication" : "division",
         currentState: "newInput",
       }));
     } else {
       if (
-        this.state.currentOperation === "multiplication" ||
-        this.state.currentOperation === "division"
+        this.state.previousOperation === "x" ||
+        this.state.previousOperation === "÷"
       ) {
         this.handleEquals();
       }
       this.setState((prevState) => ({
         ...prevState,
         currentOperation: operator === "+" ? "addition" : "substraction",
+        partialAcc: operator === "+" ? 1 : -1,
         currentState: "newInput",
       }));
     }
 
-    if (this.state.currentState === "input") {
-      this.doCalculation();
+    if (
+      this.state.currentState === "input" ||
+      this.state.currentState === "newResult"
+    ) {
+      this.doCalculation(operator);
     }
   };
 
@@ -175,7 +209,7 @@ export default class Calculator extends Component {
           name="0"
           handleClick={this.handleNumberClick}
         />
-        <Button type="number" name="." handleClick={this.showState} />
+        <Button type="number" name="." handleClick={this.handleNumberClick} />
         <Button type="primOperator" name="=" handleClick={this.handleEquals} />
       </div>
     );
