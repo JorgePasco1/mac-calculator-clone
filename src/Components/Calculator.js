@@ -62,7 +62,8 @@ export default class Calculator extends Component {
           : this.state.partialAcc / this.state.currentInput;
       this.setState((prevState) => ({
         ...prevState,
-        partialAcc: prevState.previousOperation === "-" ? -partialResult : partialResult,
+        partialAcc:
+          prevState.previousOperation === "-" ? -partialResult : partialResult,
         currentInput: partialResult,
         currentState: "newResult",
         previousOperation: operator,
@@ -128,13 +129,12 @@ export default class Calculator extends Component {
       this.state.previousOperation === "÷"
     ) {
       this.handleEquals();
-    } 
+    }
     this.setState((prevState) => ({
       ...prevState,
       currentOperation: operator,
       currentState: "newInput",
     }));
-    // }
 
     if (
       this.state.currentState === "input" ||
