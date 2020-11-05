@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import Button from "./Button.js";
 import "./Calculator.css";
 
@@ -12,39 +12,35 @@ const initialState = {
   previousOperation: "none",
 };
 
-export default class Calculator extends Component {
-  constructor() {
-    super();
-    this.state = initialState;
-  }
-
-  calculateFontSize = () => {
-    if (this.state.currentState != "input") {
-      this.setState((prevState) => ({
+export default function Calculator() {
+  const [state, setState] = useState(initialState);
+  const calculateFontSize = () => {
+    if (state.currentState !== "input") {
+      setState((prevState) => ({
         ...prevState,
         fontSize: initialState.fontSize,
       }));
     }
-    const currentInputLenght = this.state.currentInput.length;
+    const currentInputLenght = state.currentInput.length;
     if (currentInputLenght >= 8 && currentInputLenght <= 13) {
-      this.setState((prevState) => ({
+      setState((prevState) => ({
         ...prevState,
         fontSize: prevState.fontSize - 0.3,
       }));
     }
   };
-
-  handleNumberClick = (character) => {
-    this.calculateFontSize();
-    if (this.state.currentInput.length > 15) {
-      this.setState((prevState) => ({ ...prevState }));
+  const handleNumberClick = (character) => {
+    calculateFontSize();
+    if (state.currentInput.length > 15) {
+      setState((prevState) => ({ ...prevState }));
     } else {
-      if (this.state.currentState === "input") {
-        this.setState((prevState) => ({
+      if (state.currentState === "input") {
+        setState((prevState) => ({
+          ...prevState,
           currentInput: prevState.currentInput + character,
         }));
       } else {
-        this.setState((prevState) => ({
+        setState((prevState) => ({
           ...prevState,
           currentOperation: "none",
           currentInput: character,
@@ -53,14 +49,13 @@ export default class Calculator extends Component {
       }
     }
   };
-
-  doCalculation = (operator) => {
+  const doCalculation = (operator) => {
     if (operator === "x" || operator === "÷") {
       const partialResult =
         operator === "x"
-          ? this.state.partialAcc * this.state.currentInput
-          : this.state.partialAcc / this.state.currentInput;
-      this.setState((prevState) => ({
+          ? state.partialAcc * state.currentInput
+          : state.partialAcc / state.currentInput;
+      setState((prevState) => ({
         ...prevState,
         partialAcc:
           prevState.previousOperation === "-" ? -partialResult : partialResult,
@@ -69,7 +64,7 @@ export default class Calculator extends Component {
         previousOperation: operator,
       }));
     } else {
-      this.setState((prevState) => ({
+      setState((prevState) => ({
         ...prevState,
         accumulator:
           prevState.accumulator +
@@ -86,18 +81,17 @@ export default class Calculator extends Component {
       }));
     }
   };
+  const handleEquals = () => {
+    doCalculation(state.previousOperation);
 
-  handleEquals = () => {
-    this.doCalculation(this.state.previousOperation);
-
-    this.setState((prevState) => ({
+    setState((prevState) => ({
       ...prevState,
-      accumulator:
-        prevState.accumulator +
-        (prevState.previousOperation === "x" ||
-        prevState.previousOperation === "÷"
-          ? prevState.partialAcc
-          : 0),
+      // accumulator:
+      //   prevState.accumulator +
+      //   (prevState.previousOperation === "x" ||
+      //   prevState.previousOperation === "÷"
+      //     ? prevState.partialAcc
+      //     : 0),
       currentInput:
         prevState.accumulator +
         (prevState.previousOperation === "x" ||
@@ -110,97 +104,59 @@ export default class Calculator extends Component {
       previousOperation: "none",
     }));
   };
-
-  clearInput = (name) => {
+  const clearInput = (name) => {
     if (name === "AC") {
-      this.setState(initialState);
+      setState(initialState);
     } else {
-      this.setState((prevState) => ({
+      setState((prevState) => ({
         ...prevState,
         currentInput: "",
         fontSize: 3.5,
       }));
     }
   };
-
-  handlePrimOperator = (operator) => {
-    if (
-      this.state.previousOperation === "x" ||
-      this.state.previousOperation === "÷"
-    ) {
-      this.handleEquals();
+  const handlePrimOperator = (operator) => {
+    if (state.previousOperation === "x" || state.previousOperation === "÷") {
+      handleEquals();
     }
-    this.setState((prevState) => ({
+    setState((prevState) => ({
       ...prevState,
       currentOperation: operator,
       currentState: "newInput",
     }));
 
-    if (
-      this.state.currentState === "input" ||
-      this.state.currentState === "newResult"
-    ) {
-      this.doCalculation(operator);
+    if (state.currentState === "input" || state.currentState === "newResult") {
+      doCalculation(operator);
     }
   };
-
-  showState = () => {
-    console.log(this.state);
-  };
-
-  render() {
-    return (
-      <div className="Calculator">
-        <div
-          className="monitor"
-          style={{ fontSize: `${this.state.fontSize}rem` }}
-        >
-          {this.state.currentInput || 0}
-        </div>
-        <Button
-          type="secOperator"
-          name={this.state.currentInput ? "C" : "AC"}
-          handleClick={this.clearInput}
-        />
-        <Button type="secOperator" name="+/-" handleClick={this.handleClick} />
-        <Button type="secOperator" name="%" handleClick={this.handleClick} />
-        <Button
-          type="primOperator"
-          name="÷"
-          handleClick={this.handlePrimOperator}
-        />
-        <Button type="number" name="7" handleClick={this.handleNumberClick} />
-        <Button type="number" name="8" handleClick={this.handleNumberClick} />
-        <Button type="number" name="9" handleClick={this.handleNumberClick} />
-        <Button
-          type="primOperator"
-          name="x"
-          handleClick={this.handlePrimOperator}
-        />
-        <Button type="number" name="4" handleClick={this.handleNumberClick} />
-        <Button type="number" name="5" handleClick={this.handleNumberClick} />
-        <Button type="number" name="6" handleClick={this.handleNumberClick} />
-        <Button
-          type="primOperator"
-          name="-"
-          handleClick={this.handlePrimOperator}
-        />
-        <Button type="number" name="1" handleClick={this.handleNumberClick} />
-        <Button type="number" name="2" handleClick={this.handleNumberClick} />
-        <Button type="number" name="3" handleClick={this.handleNumberClick} />
-        <Button
-          type="primOperator"
-          name="+"
-          handleClick={this.handlePrimOperator}
-        />
-        <Button
-          type="zeroNumber"
-          name="0"
-          handleClick={this.handleNumberClick}
-        />
-        <Button type="number" name="." handleClick={this.handleNumberClick} />
-        <Button type="primOperator" name="=" handleClick={this.handleEquals} />
+  return (
+    <div className="Calculator">
+      <div className="monitor" style={{ fontSize: `${state.fontSize}rem` }}>
+        {state.currentInput || 0}
       </div>
-    );
-  }
+      <Button
+        type="secOperator"
+        name={state.currentInput ? "C" : "AC"}
+        handleClick={clearInput}
+      />
+      <Button type="secOperator" name="+/-" handleClick={"handleClick"} />
+      <Button type="secOperator" name="%" handleClick={"handleClick"} />
+      <Button type="primOperator" name="÷" handleClick={handlePrimOperator} />
+      <Button type="number" name="7" handleClick={handleNumberClick} />
+      <Button type="number" name="8" handleClick={handleNumberClick} />
+      <Button type="number" name="9" handleClick={handleNumberClick} />
+      <Button type="primOperator" name="x" handleClick={handlePrimOperator} />
+      <Button type="number" name="4" handleClick={handleNumberClick} />
+      <Button type="number" name="5" handleClick={handleNumberClick} />
+      <Button type="number" name="6" handleClick={handleNumberClick} />
+      <Button type="primOperator" name="-" handleClick={handlePrimOperator} />
+      <Button type="number" name="1" handleClick={handleNumberClick} />
+      <Button type="number" name="2" handleClick={handleNumberClick} />
+      <Button type="number" name="3" handleClick={handleNumberClick} />
+      <Button type="primOperator" name="+" handleClick={handlePrimOperator} />
+      <Button type="zeroNumber" name="0" handleClick={handleNumberClick} />
+      <Button type="number" name="." handleClick={handleNumberClick} />
+      <Button type="primOperator" name="=" handleClick={handleEquals} />
+    </div>
+  );
 }
