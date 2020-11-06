@@ -1,9 +1,12 @@
 import React from "react";
 import "./Button.css";
 
-export default function Button({name, type, handleClick}) {
+export default function Button({ name, type, handleClick }) {
   function childrenHandleClick() {
-    handleClick(name);
+    const unable = ["+/-", "%"];
+    if (unable.every((char) => !(char === name))) {
+      handleClick(name);
+    }
   }
 
   return (
