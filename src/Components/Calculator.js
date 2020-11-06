@@ -50,6 +50,7 @@ export default function Calculator() {
     }
   };
   const doCalculation = (operator) => {
+    calculateFontSize();
     if (operator === "x" || operator === "÷") {
       const partialResult =
         operator === "x"
@@ -86,19 +87,18 @@ export default function Calculator() {
 
     setState((prevState) => ({
       ...prevState,
-      // accumulator:
-      //   prevState.accumulator +
-      //   (prevState.previousOperation === "x" ||
-      //   prevState.previousOperation === "÷"
-      //     ? prevState.partialAcc
-      //     : 0),
+      accumulator:
+        prevState.accumulator +
+        (prevState.previousOperation === "x" ||
+        prevState.previousOperation === "÷"
+          ? prevState.partialAcc
+          : 0),
       currentInput:
         prevState.accumulator +
         (prevState.previousOperation === "x" ||
         prevState.previousOperation === "÷"
           ? prevState.partialAcc
           : 0),
-      accumulator: 0,
       partialAcc: 1,
       currentOperation: "none",
       previousOperation: "none",
@@ -116,6 +116,7 @@ export default function Calculator() {
     }
   };
   const handlePrimOperator = (operator) => {
+    calculateFontSize();
     if (state.previousOperation === "x" || state.previousOperation === "÷") {
       handleEquals();
     }
